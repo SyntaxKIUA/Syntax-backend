@@ -4,10 +4,10 @@ A feature-rich and user-friendly web application built with Django and React, de
 
 Key features include:
 
-Cycle Tracking: Log and visualize your menstrual cycle with ease.
-Health Insights: Get personalized tips based on your input.
-Reminders: Stay on top of important dates with notifications.
-Privacy First: Secure user data handling with Django's robust backend.
-Responsive Design: Seamless user experience across devices with React.
+ Cycle Tracking: Log and visualize your menstrual cycle with ease.
+ Health Insights: Get personalized tips based on your input.
+ Reminders: Stay on top of important dates with notifications.
+ Privacy First: Secure user data handling with Django's robust backend.
+ Responsive Design: Seamless user experience across devices with React.
     
 This project combines the power of Django for backend operations with React's dynamic frontend capabilities to deliver a modern and reliable solution.
