@@ -1,13 +1,27 @@
 # Luna
 
-A feature-rich and user-friendly web application built with Django and React, designed to help users track and manage their menstrual cycle effectively. The app provides insights into cycle patterns, reminders, and personalized health tips, making it an essential tool for maintaining overall well-being.
+This project is designed to help users find learning partners for their programming journey. Users can post ads to search for partners who are interested in learning together. It allows users to connect with others based on their skills, learning goals, and availability.
 
-Key features include:
+## Features
 
- Cycle Tracking: Log and visualize your menstrual cycle with ease.
- Health Insights: Get personalized tips based on your input.
- Reminders: Stay on top of important dates with notifications.
- Privacy First: Secure user data handling with Django's robust backend.
- Responsive Design: Seamless user experience across devices with React.
-    
-This project combines the power of Django for backend operations with React's dynamic frontend capabilities to deliver a modern and reliable solution.
+- Post ads to find a learning partner
+- Browse ads posted by other users
+- Connect with users who share similar learning interests
+- Simple and user-friendly interface
+
+## Setup Instructions for Developers
+
+If you have cloned this repository and want to set up the environment to work on it, follow these steps:
+
+### Prerequisites
+
+- Python 3.12 or higher
+- pip (Python package manager)
+
+### Steps to Get Started
+
+1. Navigate to the project directory:
+
+   ```bash
+   cd .\Requirements\
+
