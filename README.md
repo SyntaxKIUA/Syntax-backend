@@ -1,4 +1,4 @@
-# Luna
+# Syntax
 
 This project is designed to help users find learning partners for their programming journey. Users can post ads to search for partners who are interested in learning together. It allows users to connect with others based on their skills, learning goals, and availability.
 
