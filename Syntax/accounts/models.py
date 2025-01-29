@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser , PermissionsMixin
-
+from accounts.api.validations import Validator
 
 
 class UserManager(BaseUserManager):
@@ -9,6 +9,8 @@ class UserManager(BaseUserManager):
             raise ValueError('Users must have an email address')
         if not username:
             raise ValueError('Users must have an username')
+
+        Validator.validate_email(email)
 
         email = self.normalize_email(email)
         user = self.model(email=email,username=username, **extra_fields)
@@ -37,21 +39,28 @@ class User(AbstractBaseUser , PermissionsMixin):
     phone_number = models.CharField(max_length=15 , unique=True)
     email = models.EmailField(unique=True)
     birth_date = models.DateField(null=True, blank=True)
-    gender = models.CharField(choices=gender_choices, max_length=10, default='male', blank=True, null=True)
+    gender = models.CharField(choices=gender_choices, max_length=10, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
-    professional = models.IntegerField(max_length=10, blank=True, null=True)
+    professional = models.CharField(max_length=10, blank=True, null=True)
     followings_count = models.IntegerField(default=0)
     followers_count = models.IntegerField(default=0)
     posts_count = models.IntegerField(default=0)
-    comments_count = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name' , phone_number]
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['first_name','email', 'last_name' , 'phone_number']
+
+    def clean(self):
+        Validator.validate_email(self.email)
+        Validator.phone_number(self.phone_number)
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.username
