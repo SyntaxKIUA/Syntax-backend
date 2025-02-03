@@ -8,6 +8,7 @@ from rest_framework.response import Response
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
+
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
