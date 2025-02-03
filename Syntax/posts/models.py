@@ -5,18 +5,19 @@ from accounts.models import User
 class Post(models.Model):
     pass
 
+
 class Comment(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='comment',
-        verbose_name='User'
+        verbose_name='User',
     )
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name="Post"
+        verbose_name="Post",
     )
     comment = models.TextField()
     parent = models.ForeignKey(
@@ -25,7 +26,7 @@ class Comment(models.Model):
         null=True,
         blank=True,
         related_name='replies',
-        verbose_name="Parent Comment"
+        verbose_name="Parent Comment",
     )
 
     created_at = models.DateTimeField()
@@ -41,9 +42,15 @@ class Comment(models.Model):
 
 
 class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes_on_posts')
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes_on_comments')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='likes'
+    )
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE, related_name='likes_on_posts'
+    )
+    comment = models.ForeignKey(
+        Comment, on_delete=models.CASCADE, related_name='likes_on_comments'
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -51,21 +58,24 @@ class Like(models.Model):
 
     def clean(self):
         if not self.post and not self.comment:
-            raise ValueError('A Like must be associated with either a post or a comment, not both.')
+            raise ValueError(
+                'A Like must be associated with either a post or a comment, not both.'
+            )
         if self.post and self.comment:
-            raise ValueError('A Like cannot be associated with both a post and a comment simultaneously.')
+            raise ValueError(
+                'A Like cannot be associated with both a post and a comment simultaneously.'
+            )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'post'],
                 name='unique_user_post_like',
-                condition=models.Q(post__isnull=False)
+                condition=models.Q(post__isnull=False),
             ),
             models.UniqueConstraint(
                 fields=['user', 'comment'],
                 name='unique_user_comment_like',
-                condition=models.Q(comment__isnull=False)
-            )
+                condition=models.Q(comment__isnull=False),
+            ),
         ]
-

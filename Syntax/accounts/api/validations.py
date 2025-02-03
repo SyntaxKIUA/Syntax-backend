@@ -1,7 +1,7 @@
 import re
 
 
-class Validator():
+class Validator:
 
     @staticmethod
     def phone_number(phone_number: str) -> None:
@@ -14,5 +14,7 @@ class Validator():
     def validate_email(email: str) -> None:
         if not email:
             raise ValueError('email address is required')
-        if not re.match(r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+        if not re.match(
+            r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email
+        ):
             raise ValueError('invalid email address')
