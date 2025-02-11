@@ -4,8 +4,10 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
 )
-from accounts.api.validations import Validator
-from django.utils import timezone
+from accounts.api.validations import (
+    Validator,
+)
+from django.core.exceptions import ValidationError
 
 
 class UserManager(BaseUserManager):
@@ -16,7 +18,6 @@ class UserManager(BaseUserManager):
             raise ValueError('Users must have an username')
 
         Validator.validate_email(email)
-
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
@@ -30,7 +31,7 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
-            return ValueError('Superuser must have is_superuser=True.')
+            raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, username, password, **extra_fields)
 
@@ -40,8 +41,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=255, unique=True)
-    password = models.CharField(max_length=128)
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone_number = models.CharField(
+        max_length=15,
+        unique=True,
+    )
     email = models.EmailField(unique=True)
     birth_date = models.DateField(null=True, blank=True)
     gender = models.CharField(
@@ -62,11 +65,24 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'email', 'last_name', 'phone_number']
 
     def clean(self):
-        Validator.validate_email(self.email)
-        Validator.phone_number(self.phone_number)
+        super().clean()
+        errors = {}
+
+        try:
+            Validator.validate_email(self.email)
+        except ValidationError as e:
+            errors["email"] = e.messages
+
+        try:
+            Validator.phone_number(self.phone_number)
+        except ValidationError as e:
+            errors["phone_number"] = e.messages
+
+        if errors:
+            raise ValidationError(errors)
 
     def save(self, *args, **kwargs):
-        self.clean()
+        self.full_clean()
         super().save(*args, **kwargs)
 
     def __str__(self):

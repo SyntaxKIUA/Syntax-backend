@@ -15,4 +15,4 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'email', 'first_name', 'last_name')
 
     # delete password in django admin site
-    exclude = ('password',)
+    # exclude = ('password',)

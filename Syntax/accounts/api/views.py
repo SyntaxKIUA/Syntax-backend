@@ -1,16 +1,14 @@
 from rest_framework import generics
-from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.views import TokenRefreshView
-from .serializers import RegisterSerializer, LoginSerializer
 from rest_framework.response import Response
+from .serializers import CustomRegisterSerializer, CustomLoginSerializer
 
 
 class RegisterView(generics.CreateAPIView):
-    serializer_class = RegisterSerializer
+    serializer_class = CustomRegisterSerializer
 
 
 class LoginView(generics.GenericAPIView):
-    serializer_class = LoginSerializer
+    serializer_class = CustomLoginSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
