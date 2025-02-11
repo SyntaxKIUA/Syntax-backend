@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser , PermissionsMixin
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin, AbstractUser
 from accounts.api.validations import Validator
 from django.utils import timezone
 
@@ -31,12 +31,11 @@ class UserManager(BaseUserManager):
         return self.create_user(email, username, password, **extra_fields)
 
 
-class User(AbstractBaseUser , PermissionsMixin):
+class User(AbstractUser, PermissionsMixin):
     gender_choices = (('male','Male'),('female','Female'))
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=255 , unique=True)
-    password = models.CharField(max_length=128)
     phone_number = models.CharField(max_length=15 , unique=True)
     email = models.EmailField(unique=True)
     birth_date = models.DateField(null=True, blank=True)
