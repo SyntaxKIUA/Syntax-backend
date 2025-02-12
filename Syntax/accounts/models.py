@@ -4,20 +4,12 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
 )
-from accounts.api.validations import (
-    Validator,
-)
-from django.core.exceptions import ValidationError
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class UserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
-        if not email:
-            raise ValueError('Users must have an email address')
-        if not username:
-            raise ValueError('Users must have an username')
 
-        Validator.validate_email(email)
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
@@ -28,22 +20,16 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
-
         return self.create_user(email, username, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
     gender_choices = (('male', 'Male'), ('female', 'Female'))
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
     username = models.CharField(max_length=255, unique=True)
-    phone_number = models.CharField(
-        max_length=15,
-        unique=True,
+    phone_number = PhoneNumberField(
+        max_length=15, unique=True, blank=True, null=True, region="IR"
     )
     email = models.EmailField(unique=True)
     birth_date = models.DateField(null=True, blank=True)
@@ -66,20 +52,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def clean(self):
         super().clean()
-        errors = {}
-
-        try:
-            Validator.validate_email(self.email)
-        except ValidationError as e:
-            errors["email"] = e.messages
-
-        try:
-            Validator.phone_number(self.phone_number)
-        except ValidationError as e:
-            errors["phone_number"] = e.messages
-
-        if errors:
-            raise ValidationError(errors)
 
     def save(self, *args, **kwargs):
         self.full_clean()

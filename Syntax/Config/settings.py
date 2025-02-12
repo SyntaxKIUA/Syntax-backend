@@ -63,15 +63,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'dj_rest_auth',
     'dj_rest_auth.registration',
+    'phonenumber_field',
 ]
 
 
 SITE_ID = 1
-
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 MIDDLEWARE = [
@@ -131,9 +127,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'path.to.custom.LoginSerializer',
+    'TOKEN_SERIALIZER': 'path.to.custom.TokenSerializer',
 }
 
 SIMPLE_JWT = {
@@ -152,6 +154,10 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'jwt-auth',
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -183,10 +189,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # allauth settings
 AUTH_USER_MODEL = 'accounts.User'
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
-ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_EMAIL_REQUIRED = True
+
 
 REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'accounts.api.views.CustomRegisterSerializer',
+    'REGISTER_SERIALIZER': 'accounts.api.serializers.CustomRegisterSerializer',
 }
