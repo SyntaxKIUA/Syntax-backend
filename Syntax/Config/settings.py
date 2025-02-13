@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 import os
@@ -138,13 +137,13 @@ REST_AUTH_SERIALIZERS = {
     'TOKEN_SERIALIZER': 'path.to.custom.TokenSerializer',
 }
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
-    "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
-    "AUTH_HEADER_TYPES": ("Bearer",),
-}
+# SIMPLE_JWT = {
+#     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+#     "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
+#     "ROTATE_REFRESH_TOKENS": True,
+#     "BLACKLIST_AFTER_ROTATION": True,
+#     "AUTH_HEADER_TYPES": ("Bearer",),
+# }
 
 
 AUTHENTICATION_BACKENDS = [
@@ -188,14 +187,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # allauth settings
 AUTH_USER_MODEL = 'accounts.User'
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
-# ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USERNAME_REQUIRED = True
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+
+
+# REST_AUTH_REGISTER_SERIALIZERS = {
+#     'REGISTER_SERIALIZER': 'accounts.api.serializers.CustomRegisterSerializer',
+# }
+
+# email config for dj_rest_auth
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_EMAIL_REQUIRED = True
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_USER_TLS = os.getenv("EMAIL_USER_TLS")
+EMAIL_PORT = os.getenv("EMAIL_PORT_TSL")
+EMAIL_USE_TLS = os.getenv("EMAIL_USER_TLS")
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-
-REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'accounts.api.serializers.CustomRegisterSerializer',
-}
+PASSWORD_RESET_CONFIRM_URL = 'api/auth/password/reset/confirm/{uid}/{token}/'
