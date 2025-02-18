@@ -25,7 +25,7 @@ class JWTTokenMixin:
             value=access_token,
             httponly=True,
             samesite="Lax",
-            secure=False # in production env must be (True)
+            secure=True # in production env must be (True)
         )
 
         return {
