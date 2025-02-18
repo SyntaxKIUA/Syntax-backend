@@ -31,6 +31,7 @@ class RegisterView(JWTTokenMixin, generics.CreateAPIView):
 
 
 class LoginView(JWTTokenMixin, generics.GenericAPIView):
+
     serializer_class = LoginSerializer
     permission_classes = [AllowAny]
 
