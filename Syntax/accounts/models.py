@@ -35,11 +35,11 @@ class UserManager(BaseUserManager):
         return self.create_user(email, username, password, **extra_fields)
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    gender_choices = (('male', 'Male'), ('female', 'Female'))
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    username = models.CharField(max_length=255, unique=True)
+class User(AbstractBaseUser , PermissionsMixin):
+    gender_choices = (('male','Male'),('female','Female'))
+    first_name = models.CharField(max_length=50, null=True, blank=True)
+    last_name = models.CharField(max_length=50, null=True, blank=True)
+    username = models.CharField(max_length=255 , unique=True)
     password = models.CharField(max_length=128)
     phone_number = models.CharField(max_length=15, unique=True)
     email = models.EmailField(unique=True)
