@@ -24,9 +24,17 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('accounts.urls'), name='accounts'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/swagger.yaml', TemplateView.as_view(
-        template_name='Swagger/swagger.yaml',
-        content_type='application/yaml'
-    ), name='swagger-yaml'),
+    path(
+        'api/swagger/',
+        SpectacularSwaggerView.as_view(url_name='schema'),
+        name='swagger-ui',
+    ),
+    path(
+        'api/swagger.yaml',
+        TemplateView.as_view(
+            template_name='Swagger/swagger.yaml',
+            content_type='application/yaml',
+        ),
+        name='swagger-yaml',
+    ),
 ]
