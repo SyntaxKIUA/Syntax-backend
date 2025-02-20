@@ -4,7 +4,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from rest_framework import serializers
-from rest_framework_simplejwt.tokens import RefreshToken
+
+# from rest_framework_simplejwt.tokens import RefreshToken
 
 
 User = get_user_model()
@@ -110,3 +111,9 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         user.set_password(self.validated_data['new_password'])
         user.save()
         return user
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'username']

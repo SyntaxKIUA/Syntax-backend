@@ -1,4 +1,4 @@
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import generics, status
 from rest_framework.response import Response
@@ -16,6 +16,7 @@ from .serializers import (
     RegisterSerializer,
     LoginSerializer,
     PasswordResetConfirmSerializer,
+    UserProfileSerializer,
 )
 from .utils import JWTTokenMixin
 from accounts.otp_services import send_sms_kavenegar
@@ -179,3 +180,12 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         return Response(
             {"detail": "password is changed!"}, status=status.HTTP_200_OK
         )
+
+
+class UserProfileView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data)

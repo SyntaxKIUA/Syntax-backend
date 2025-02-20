@@ -6,6 +6,7 @@ from accounts.api.views import (
     LoginView,
     LogoutView,
     PasswordResetConfirmView,
+    UserProfileView,
 )
 
 urlpatterns = [
@@ -25,4 +26,5 @@ urlpatterns = [
         PasswordResetConfirmView.as_view(),
         name='password_reset_confirm',
     ),
+    path('api/profile/', UserProfileView.as_view(), name='user_profile'),
 ]
