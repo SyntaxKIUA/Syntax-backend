@@ -4,51 +4,80 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
 )
+from django.core.exceptions import ValidationError
 from accounts.api.validations import Validator
-from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, username, password=None, **extra_fields):
+    def create_user(
+        self, email, username, phone_number, password=None, **extra_fields
+    ):
         if not email:
-            raise ValueError('Users must have an email address')
+            raise ValidationError(
+                {'email': _('Users must have an email address')}
+            )
         if not username:
-            raise ValueError('Users must have an username')
-
-        Validator.validate_email(email)
+            raise ValidationError(
+                {'username': _('Users must have a username')}
+            )
+        if not password:
+            raise ValidationError(
+                {'password': _('Users must have a password')}
+            )
+        if not phone_number:
+            raise ValidationError(
+                {'phone_number': _('Users must have a phone number')}
+            )
 
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, **extra_fields)
+        user = self.model(
+            email=email,
+            username=username,
+            phone_number=phone_number,
+            **extra_fields
+        )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, password=None, **extra_fields):
+    def create_superuser(
+        self, email, username, phone_number, password=None, **extra_fields
+    ):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
         if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
+            raise ValidationError(
+                {'is_staff': _('Superuser must have is_staff=True.')}
+            )
         if extra_fields.get('is_superuser') is not True:
-            return ValueError('Superuser must have is_superuser=True.')
+            raise ValidationError(
+                {'is_superuser': _('Superuser must have is_superuser=True.')}
+            )
 
-        return self.create_user(email, username, password, **extra_fields)
+        return self.create_user(
+            email, username, phone_number, password, **extra_fields
+        )
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    gender_choices = (('male', 'Male'), ('female', 'Female'))
+    GENDER_CHOICES = (('male', 'Male'), ('female', 'Female'))
     first_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=50, null=True, blank=True)
-    username = models.CharField(max_length=255, unique=True)
-    password = models.CharField(max_length=128)
-    phone_number = models.CharField(max_length=15, unique=True)
-    email = models.EmailField(unique=True)
+    username = models.CharField(
+        max_length=32, unique=True, blank=False, null=False
+    )
+    phone_number = models.CharField(
+        max_length=11, unique=True, blank=False, null=False
+    )
+    email = models.EmailField(unique=True, blank=False, null=False)
     birth_date = models.DateField(null=True, blank=True)
     gender = models.CharField(
-        choices=gender_choices, max_length=10, blank=True, null=True
+        choices=GENDER_CHOICES, max_length=10, blank=True, null=True
     )
     bio = models.TextField(blank=True, null=True)
-    professional = models.CharField(max_length=10, blank=True, null=True)
+    professional = models.CharField(max_length=255, blank=True, null=True)
     followings_count = models.IntegerField(default=0)
     followers_count = models.IntegerField(default=0)
     posts_count = models.IntegerField(default=0)
@@ -59,14 +88,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['first_name', 'email', 'last_name', 'phone_number']
+    REQUIRED_FIELDS = ['email', 'phone_number']
 
     def clean(self):
         Validator.validate_email(self.email)
         Validator.phone_number(self.phone_number)
 
     def save(self, *args, **kwargs):
-        self.clean()
+        self.full_clean()
         super().save(*args, **kwargs)
 
     def __str__(self):
