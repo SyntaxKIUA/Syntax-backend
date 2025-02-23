@@ -30,7 +30,7 @@ class UserManager(BaseUserManager):
                 {'phone_number': _('Users must have a phone number')}
             )
 
-        email = self.normalize_email(email)
+        email = self.normalize_email(email).lower()
         user = self.model(
             email=email,
             username=username,
@@ -90,12 +90,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'phone_number']
 
-    def clean(self):
+    def full_clean(self):
+        self.email = self.email.lower()
         Validator.validate_email(self.email)
         Validator.phone_number(self.phone_number)
 
     def save(self, *args, **kwargs):
-        self.full_clean()
+        self.clean()
         super().save(*args, **kwargs)
 
     def __str__(self):
