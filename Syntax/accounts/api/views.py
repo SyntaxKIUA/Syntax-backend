@@ -14,7 +14,6 @@ from django.utils.encoding import force_bytes
 from .serializers import (
     ForgotPasswordSerializer,
     RegisterSerializer,
-    LoginSerializer,
     PasswordResetConfirmSerializer,
     UserProfileSerializer,
 )
@@ -29,55 +28,19 @@ class RegisterView(JWTTokenMixin, generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
 
+    def perform_create(self, serializer):
+        self.user = serializer.save()
+
     def create(self, request, *args, **kwargs):
         if self.is_authenticated(request):
             return Response(
-                {"detail": "You are already logged in."}, status=400
+                {"detail": "You are already logged in."},
+                status=400
             )
-
         response = super().create(request, *args, **kwargs)
 
-        user = User.objects.get(username=request.data["username"])
-        tokens = self.set_jwt_cookie(response, user)
-
+        tokens = self.set_jwt_cookie(response, self.user)
         response.data = {**tokens, "message": "User registered successfully"}
-
-        return response
-
-
-class LoginView(JWTTokenMixin, generics.GenericAPIView):
-
-    serializer_class = LoginSerializer
-    permission_classes = [AllowAny]
-
-    def post(self, request, *args, **kwargs):
-        if self.is_authenticated(request):
-            return Response(
-                {"detail": "You are already logged in."}, status=400
-            )
-
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-
-        user = data.get('user')
-
-        if user is None:
-            return Response(
-                {"detail": "User not found or invalid credentials."},
-                status=400,
-            )
-
-        response = Response(
-            {
-                "message": "Login successful",
-            }
-        )
-
-        tokens = self.set_jwt_cookie(response, user)
-
-        response.data = {**tokens, **response.data}
-
         return response
 
 
@@ -88,6 +51,7 @@ class LogoutView(APIView):
         response = Response({"message": "Logout successful"})
 
         response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
 
         return response
 
@@ -97,95 +61,78 @@ class ForgotPasswordView(generics.GenericAPIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return Response(
-                {"detail": "you most first logout"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        field_type = serializer.validated_data['field_type']
 
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        user = serializer.validated_data["user"]
+        field_type = serializer.validated_data["field_type"]
 
-        reset_path = reverse(
-            'password_reset_confirm', kwargs={'uidb64': uid, 'token': token}
-        )
-
-        reset_url = (
-            f"{settings.FRONTEND_URL}{reset_path}"
-            if hasattr(settings, 'FRONTEND_URL')
-            else reset_path
-        )
+        reset_url = self.generate_reset_url(user)
 
         if field_type == "email":
-            send_mail(
-                subject="password change request",
-                message=f"for password reset please click the link:\n{reset_url}",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
-            return Response(
-                {"detail": "link sended to your email"},
-                status=status.HTTP_200_OK,
-            )
-
+            return self.send_email(user.email, reset_url)
         elif field_type == "phone_number":
-            message = (
-                f"پسورد جدید شما برای ورود به سایت تست واحد فنی:\n{reset_url}"
-            )
-            try:
-                sms_response = send_sms_kavenegar(user.phone_number, message)
-            except Exception as e:
-                return Response(
-                    {"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST
-                )
+            return self.send_sms(user.phone_number, reset_url)
 
+        return Response(
+            {"detail": "Invalid field_type"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    def generate_reset_url(self, user):
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        reset_path = reverse("password_reset_confirm", kwargs={
+                             "uidb64": uid, "token": token})
+
+        frontend_url = getattr(settings, "FRONTEND_URL", "").rstrip("/")
+        return f"{frontend_url}{reset_path}" if frontend_url else reset_path
+
+    def send_email(self, email, reset_url):
+        send_mail(
+            subject="Password Reset Request",
+            message=f"برای تغییر رمزعبور خود روی لینک زیر کلیک کنید:\n{reset_url}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        return Response(
+            {"detail": "Link sent to your email"},
+            status=status.HTTP_200_OK,
+        )
+
+    def send_sms(self, phone_number, reset_url):
+        message = f"پسورد جدید شما برای ورود به سایت تست واحد فنی:\n{reset_url}"
+        try:
+            sms_response = send_sms_kavenegar(phone_number, message)
             return Response(
-                {
-                    "detail": "password sended with sms",
-                    "sms_response": sms_response,
-                },
+                {"detail": "Password reset link sent via SMS",
+                    "sms_response": sms_response},
                 status=status.HTTP_200_OK,
             )
-
-        else:
+        except Exception as e:
             return Response(
-                {"detail": "user not found"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST
             )
 
 
 class PasswordResetConfirmView(generics.GenericAPIView):
     serializer_class = PasswordResetConfirmSerializer
 
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update(
-            {
-                'uidb64': self.kwargs.get('uidb64'),
-                'token': self.kwargs.get('token'),
-            }
-        )
-        return context
-
     def post(self, request, uidb64, token, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={
+                                         "uidb64": uidb64, "token": token})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(
-            {"detail": "password is changed!"}, status=status.HTTP_200_OK
+            {"detail": "Password has been changed successfully!"},
+            status=status.HTTP_200_OK
         )
 
 
-class UserProfileView(APIView):
-    permission_classes = [AllowAny]
+class UserProfileView(generics.RetrieveAPIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        user = request.user
-        serializer = UserProfileSerializer(user)
-        return Response(serializer.data)
+    def get_object(self):
+        return self.request.user

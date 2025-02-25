@@ -1,6 +1,9 @@
-from django.utils.translation import gettext as _
-from django.core.exceptions import ValidationError
+import re
 import jdatetime
+from rest_framework import serializers
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 
 def validate_jalali_date(value):
@@ -17,9 +20,22 @@ def validate_jalali_date(value):
             raise ValidationError(f"تاریخ جلالی نامعتبر: {value}. {e}")
 
 
-def validate_non_empty_password(password):
-    if not password:
-        raise ValidationError(
-            _("Password must not be empty."),
-            code="password_empty"
-        )
+class ValidatorForgotPassword:
+    IRAN_PHONE_REGEX = re.compile(r'^09\d{9}$')
+
+    @staticmethod
+    def clean_identifier(value):
+        return value.strip()
+
+    @staticmethod
+    def get_identifier_field(identifier):
+        if ValidatorForgotPassword.IRAN_PHONE_REGEX.match(identifier):
+            return "phone_number"
+        elif "@" in identifier:
+            try:
+                validate_email(identifier)
+            except DjangoValidationError:
+                raise serializers.ValidationError(
+                    "Email format is not correct.")
+            return "email"
+        return False
