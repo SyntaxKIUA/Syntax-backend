@@ -1,9 +1,12 @@
-from django.contrib.auth import get_user_model, authenticate
+import re
+from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from rest_framework import serializers
+
+from .validations import ValidatorForgotPassword
 
 # from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -27,43 +30,21 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
-
-    def validate(self, data):
-        username = data.get('username')
-        password = data.get('password')
-
-        user = authenticate(username=username, password=password)
-        if user is None:
-            raise serializers.ValidationError("Invalid username or password")
-
-        return {'user': user}
-
-
 class ForgotPasswordSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=False, allow_blank=True)
-    phone_number = serializers.CharField(required=False, allow_blank=True)
+    identifier = serializers.CharField(label="Email, phone number or username")
+    iran_phone_regex = re.compile(r'^09\d{9}$')
+
+    def validate_identifier(self, value):
+        return ValidatorForgotPassword.clean_identifier(value)
 
     def validate(self, data):
-        provided_fields = [
-            field for field in ['email', 'phone_number'] if data.get(field)
-        ]
-        if len(provided_fields) != 1:
-            raise serializers.ValidationError(
-                "pleas enter ones of phone number or email or username"
-            )
-
-        field = provided_fields[0]
-        identifier = data.get(field)
-
+        identifier = data.get('identifier')
+        field = ValidatorForgotPassword.get_identifier_field(identifier)
         lookup = {field: identifier}
         try:
             user = User.objects.get(**lookup)
         except User.DoesNotExist:
-            raise serializers.ValidationError("user not found!")
-
+            raise serializers.ValidationError("User not found.")
         data['user'] = user
         data['field_type'] = field
         return data

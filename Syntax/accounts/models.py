@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
-from accounts.api.validations import validate_jalali_date
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
@@ -26,7 +25,6 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     birth_date = models.DateField(
         max_length=10,
-        validators=[validate_jalali_date],
         help_text="فرمت: YYYY-MM-DD",
         blank=True,
         null=True

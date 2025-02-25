@@ -37,4 +37,6 @@ urlpatterns = [
         ),
         name='swagger-yaml',
     ),
+    # for development
+    # path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
 ]
