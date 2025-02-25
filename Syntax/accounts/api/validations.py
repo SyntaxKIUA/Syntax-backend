@@ -1,21 +1,25 @@
-import re
+from django.utils.translation import gettext as _
+from django.core.exceptions import ValidationError
+import jdatetime
 
 
-class Validator:
+def validate_jalali_date(value):
 
-    @staticmethod
-    def phone_number(phone_number: str) -> None:
-        # if not phone_number:
-        #     raise ValueError('Phone number is required')
-        # if not re.match(r'^09[0-9]{9}$', phone_number):
-        #     raise ValueError('Invalid mobile number')
-        pass
+    if value:
+        try:
+            parts = value.split('-')
+            if len(parts) != 3:
+                raise ValueError("فرمت تاریخ باید 'YYYY-MM-DD' باشد.")
 
-    @staticmethod
-    def validate_email(email: str) -> None:
-        if not email:
-            raise ValueError('email address is required')
-        if not re.match(
-            r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email
-        ):
-            raise ValueError('invalid email address')
+            year, month, day = map(int, parts)
+            jdatetime.date(year, month, day)
+        except Exception as e:
+            raise ValidationError(f"تاریخ جلالی نامعتبر: {value}. {e}")
+
+
+def validate_non_empty_password(password):
+    if not password:
+        raise ValidationError(
+            _("Password must not be empty."),
+            code="password_empty"
+        )

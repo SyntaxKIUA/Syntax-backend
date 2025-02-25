@@ -1,6 +1,6 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.exceptions import PermissionDenied
+
 
 class JWTTokenMixin:
 
@@ -16,6 +16,7 @@ class JWTTokenMixin:
     def is_authenticated(self, request):
         token = self.get_token_from_request(request)
         return token is not None
+
     def set_jwt_cookie(self, response, user):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
@@ -25,10 +26,7 @@ class JWTTokenMixin:
             value=access_token,
             httponly=True,
             samesite="Lax",
-            secure=True # in production env must be (True)
+            secure=True,  # in production env must be (True)
         )
 
-        return {
-            "refresh": str(refresh),
-            "access": access_token
-        }
+        return {"refresh": str(refresh), "access": access_token}
