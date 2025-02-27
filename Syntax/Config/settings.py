@@ -134,10 +134,11 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Swagger Documentation',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    'SWAGGER_UI_DIST': 'SIDECAR',
-    'SWAGGER_UI_FAVICON': 'SIDECAR',
-    'REDOC_DIST': 'SIDECAR',
+    'SWAGGER_UI_DIST': 'https://path/to/your/local/swagger-ui/',  # مسیر محلی به UI Swagger
+    'SWAGGER_UI_FAVICON': 'https://path/to/your/local/favicon.ico',
+    'REDOC_DIST': 'SIDECAR',  # یا می‌توانید مسیر محلی خود را برای Redoc تعیین کنید
 }
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
