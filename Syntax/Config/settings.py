@@ -174,6 +174,7 @@ STATICFILES_DIRS = [BASE_DIR / "assets"]
 MEDIA_URL = "/media/"
 STATIC_ROOT = "/home/syntax/my_projects/Syntax-backend/Syntax/static"
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
