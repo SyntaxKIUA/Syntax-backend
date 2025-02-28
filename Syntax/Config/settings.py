@@ -38,7 +38,7 @@ DATABASES = {
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', default=True)
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
@@ -134,11 +134,10 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Swagger Documentation',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    'SWAGGER_UI_DIST': 'https://path/to/your/local/swagger-ui/',  # مسیر محلی به UI Swagger
-    'SWAGGER_UI_FAVICON': 'https://path/to/your/local/favicon.ico',
-    'REDOC_DIST': 'SIDECAR',  # یا می‌توانید مسیر محلی خود را برای Redoc تعیین کنید
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
 }
-
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
@@ -170,15 +169,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR /"staticfiles"
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'), 
+    str(BASE_DIR / "static")
 ]
 
-# مسیر فایل‌های مدیا
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
