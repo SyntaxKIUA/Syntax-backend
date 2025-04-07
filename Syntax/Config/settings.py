@@ -70,7 +70,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
+
+
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'", 'https://trustedscript.com')
+CSP_IMG_SRC = ("'self'", 'https://trustedimages.com')
+CSP_STYLE_SRC = ("'self'", 'https://trustedstyles.com')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
