@@ -1,0 +1,39 @@
+services:
+ db:
+   image: postgres:17
+   environment:
+     POSTGRES_DB: ${DATABASE_NAME}
+     POSTGRES_USER: ${DATABASE_USER}
+     POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+   ports:
+     - "5433:5432"
+   volumes:
+     - postgres_data:/var/lib/postgresql/data
+   env_file:
+     - .env
+
+ django-web:
+   build: .
+   container_name: syntax-backend
+   ports:
+     - "8000:8000"
+   depends_on:
+     - db
+   environment:
+     SECRET_KEY: ${SECRET_KEY}
+     DEBUG: ${DEBUG}
+     ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+     DATABASE_NAME: ${DATABASE_NAME}
+     DATABASE_USER: ${DATABASE_USER}
+
+     DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+     DATABASE_HOST: ${DATABASE_HOST}
+     DATABASE_PORT: ${DATABASE_PORT}
+
+
+   env_file:
+     - .env
+   volumes:
+     - ./static:/app/static
+volumes:
+  postgres_data:
