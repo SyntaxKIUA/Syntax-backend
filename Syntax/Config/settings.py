@@ -173,19 +173,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_ROOT = '/app/static'
-# STATICFILES_DIRS = [BASE_DIR / "assets"]
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
+STATIC_URL = '/static/'  # مسیر فایل‌های استاتیک
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # مسیر برای جمع‌آوری فایل‌های استاتیک در production
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 
 
-
-STATICFILES_DIRS = [
-    str(BASE_DIR / "static")
-]
-
-MEDIA_URL = '/media/'
+MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
@@ -194,6 +190,11 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.User'
+
+# debug_toolbar
+INSTALLED_APPS += ['debug_toolbar']
+MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
+INTERNAL_IPS = ['127.0.0.1']
 
 # SMTP settings
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
@@ -216,3 +217,4 @@ PASSWORD_RESET_TIMEOUT = 60 * 15
 # phone number settigns
 PHONENUMBER_DEFAULT_REGION = 'IR'
 PHONENUMBER_DB_FORMAT = 'E164'
+
