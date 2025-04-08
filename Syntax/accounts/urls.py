@@ -28,5 +28,5 @@ urlpatterns = [
         PasswordResetConfirmView.as_view(),
         name='password_reset_confirm',
     ),
-    path('api/profile/', UserProfileView.as_view(), name='user_profile'),
+    path('api/profile/<str:username>', UserProfileView.as_view(), name='user_profile'),
 ]

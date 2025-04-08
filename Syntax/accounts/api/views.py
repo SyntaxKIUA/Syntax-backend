@@ -1,3 +1,4 @@
+from django.db import connection
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import generics, status
@@ -15,7 +16,8 @@ from .serializers import (
     ForgotPasswordSerializer,
     RegisterSerializer,
     PasswordResetConfirmSerializer,
-    UserProfileSerializer,
+    PrivateProfileSerializer,
+    PublicProfileSerializer
 )
 from .utils import JWTTokenMixin
 from accounts.otp_services import send_sms_kavenegar
@@ -131,8 +133,27 @@ class PasswordResetConfirmView(generics.GenericAPIView):
 
 
 class UserProfileView(generics.RetrieveAPIView):
-    serializer_class = UserProfileSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        return self.request.user
+    def get(self, request, *args, **kwargs):
+        username = kwargs.get('username')
+
+        connection.queries.clear()
+
+        user = User.objects.select_related("profile").get(username=username)
+
+        if not user:
+            return Response(f"The user {username} is not active or does not exist.", status=status.HTTP_403_FORBIDDEN)
+
+        print(user)
+        print(connection.queries)
+        print(len(connection.queries))
+
+        if request.user.id != user.id:
+            profile_serializer = PublicProfileSerializer(user.profile)
+        else:
+            profile_serializer = PrivateProfileSerializer(user.profile)
+
+        return Response(profile_serializer.data, status=status.HTTP_200_OK)
+
+
