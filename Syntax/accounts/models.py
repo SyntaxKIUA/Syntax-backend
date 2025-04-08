@@ -31,14 +31,21 @@ class User(AbstractUser):
     )
     gender = models.CharField(choices=GENDER_CHOICES,
                               max_length=10, blank=True, null=True)
-    bio = models.TextField(blank=True, null=True)
-    professional = models.CharField(max_length=255, blank=True, null=True)
-    followings_count = models.PositiveIntegerField(default=0)
-    followers_count = models.PositiveIntegerField(default=0)
-    posts_count = models.PositiveIntegerField(default=0)
+
+    is_active = models.BooleanField(_("is active"), default=True)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'phone_number']
 
     def __str__(self):
         return self.username
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile", null=False, blank=False)
+
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    bio = models.TextField(blank=True, null=True)
+    professional = models.CharField(max_length=255, blank=True, null=True)
+    followings_count = models.PositiveIntegerField(default=0)
+    followers_count = models.PositiveIntegerField(default=0)
+    posts_count = models.PositiveIntegerField(default=0)

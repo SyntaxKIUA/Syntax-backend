@@ -7,12 +7,16 @@ from django.utils.encoding import force_str
 from rest_framework import serializers
 
 from .validations import ValidatorForgotPassword
+from ..models import Profile
 
 # from rest_framework_simplejwt.tokens import RefreshToken
 
 
 User = get_user_model()
-
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
@@ -94,7 +98,45 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return user
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class PrivateProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    first_name = serializers.CharField(source='user.first_name', read_only=True)
+    last_name = serializers.CharField(source='user.last_name', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    phone_number = serializers.CharField(source='user.phone_number', read_only=True)
     class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'username']
+        model = Profile
+        fields = [
+            'username',
+            'email',
+            'phone_number',
+            'first_name',
+            'last_name',
+            'bio',
+            'professional',
+            'followings_count',
+            'followers_count',
+            'posts_count',
+            'avatar'
+        ]
+
+
+class PublicProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    first_name = serializers.CharField(source='user.first_name', read_only=True)
+    last_name = serializers.CharField(source='user.last_name', read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = [
+            'username',
+            'first_name',
+            'last_name',
+            'bio',
+            'professional',
+            'followings_count',
+            'followers_count',
+            'posts_count',
+            'avatar'
+        ]
+

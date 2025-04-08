@@ -1,6 +1,7 @@
 db.sqlite3
 media/
 assets/
+avatar/
 # pyproject.toml
 **/migrations/**
 migrations/
