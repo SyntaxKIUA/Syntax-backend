@@ -1,4 +1,5 @@
 from django.db import connection
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import generics, status
@@ -17,11 +18,11 @@ from .serializers import (
     RegisterSerializer,
     PasswordResetConfirmSerializer,
     PrivateProfileSerializer,
-    PublicProfileSerializer
+    PublicProfileSerializer, UpdateUserSerializer
 )
 from .utils import JWTTokenMixin
 from accounts.otp_services import send_sms_kavenegar
-
+from ..models import Profile
 
 User = get_user_model()
 
@@ -31,7 +32,9 @@ class RegisterView(JWTTokenMixin, generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
-        self.user = serializer.save()
+        user = serializer.save()
+        Profile.objects.create(user=user)
+        return user
 
     def create(self, request, *args, **kwargs):
         if self.is_authenticated(request):
@@ -140,6 +143,7 @@ class UserProfileView(generics.RetrieveAPIView):
 
         connection.queries.clear()
 
+        # fix for is_active
         user = User.objects.select_related("profile").get(username=username)
 
         if not user:
@@ -156,4 +160,18 @@ class UserProfileView(generics.RetrieveAPIView):
 
         return Response(profile_serializer.data, status=status.HTTP_200_OK)
 
+
+class UpdateProfileView(generics.RetrieveUpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UpdateUserSerializer
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_user(self):
+        return self.request.user.profile
+
+    def patch(self, request, *args, **kwargs):
+        serializer = self.get_serializer(self.get_user(), data=request.data, partial=True,)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 

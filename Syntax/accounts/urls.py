@@ -4,7 +4,7 @@ from accounts.api.views import (
     RegisterView,
     LogoutView,
     PasswordResetConfirmView,
-    UserProfileView,
+    UserProfileView, UpdateProfileView,
 )
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -29,4 +29,6 @@ urlpatterns = [
         name='password_reset_confirm',
     ),
     path('api/profile/<str:username>', UserProfileView.as_view(), name='user_profile'),
+
+    path('api/update-user-profile', UpdateProfileView.as_view(), name='update_user_profile'),
 ]

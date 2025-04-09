@@ -49,3 +49,6 @@ class Profile(models.Model):
     followings_count = models.PositiveIntegerField(default=0)
     followers_count = models.PositiveIntegerField(default=0)
     posts_count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.user.username
