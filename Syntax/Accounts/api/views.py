@@ -21,7 +21,7 @@ from .serializers import (
     PublicProfileSerializer, UpdateUserSerializer
 )
 from .utils import JWTTokenMixin
-from accounts.otp_services import send_sms_kavenegar
+from Accounts.otp_services import send_sms_kavenegar
 from ..models import Profile
 
 User = get_user_model()
