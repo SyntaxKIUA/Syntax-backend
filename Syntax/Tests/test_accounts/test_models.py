@@ -1,6 +1,6 @@
 from django.test import Client
 import pytest
-from accounts.models import User
+from Accounts.models import User
 from django.utils import timezone
 from django.db import IntegrityError
 from django.contrib.auth import get_user_model

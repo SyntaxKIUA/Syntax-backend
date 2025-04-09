@@ -140,3 +140,32 @@ class PublicProfileSerializer(serializers.ModelSerializer):
             'avatar'
         ]
 
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    birth_date = serializers.CharField(source='user.birth_date')
+
+    class Meta :
+        model = Profile
+        fields = [
+            'username', 'first_name', 'last_name', 'birth_date', 'avatar', 'bio', 'professional'
+
+        ]
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+
+        user = instance.user
+
+
+        for attr, value in user_data.items():
+            setattr(user, attr, value)
+        user.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance

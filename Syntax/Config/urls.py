@@ -26,7 +26,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('users/', include('accounts.urls'), name='accounts'),
+    path('users/', include('Accounts.urls'), name='Accounts'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path(
         'api/swagger/',
@@ -72,7 +72,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('users/', include('accounts.urls'), name='accounts'),
+    path('users/', include('Accounts.urls'), name='Accounts'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path(
         'api/swagger/',

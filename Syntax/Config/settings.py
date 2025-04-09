@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts.apps.AccountsConfig',
+    'Accounts.apps.AccountsConfig',
     # Packages
     'rest_framework',
     'rest_framework_simplejwt',
@@ -189,7 +189,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'Accounts.User'
 
 # debug_toolbar
 INSTALLED_APPS += ['debug_toolbar']
