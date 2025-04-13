@@ -425,7 +425,7 @@ module.exports = function(XRegExp) {
     // Storage for Unicode data
     var unicode = {};
 
-    // Reuse utils
+    // Reuse Utils
     var dec = XRegExp._dec;
     var hex = XRegExp._hex;
     var pad4 = XRegExp._pad4;

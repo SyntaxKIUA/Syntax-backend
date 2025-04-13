@@ -52,7 +52,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var utils = require('../utils');
+var utils = require('../Utils');
 
 function trim(str) {
   return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
@@ -144,7 +144,7 @@ var document = require('./document');
 var codecs = require('./codecs');
 var errors = require('./errors');
 var transports = require('./transports');
-var utils = require('./utils');
+var utils = require('./Utils');
 
 function lookupLink(node, keys) {
   var _iteratorNormalCompletion = true;
@@ -582,7 +582,7 @@ var codecs = require('./codecs');
 var document = require('./document');
 var errors = require('./errors');
 var transports = require('./transports');
-var utils = require('./utils');
+var utils = require('./Utils');
 
 var coreapi = {
   Client: client.Client,
@@ -606,7 +606,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var fetch = require('isomorphic-fetch');
 var errors = require('../errors');
-var utils = require('../utils');
+var utils = require('../Utils');
 var URL = require('url-parse');
 var urlTemplate = require('url-template');
 

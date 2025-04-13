@@ -1,4 +1,5 @@
 from django.db import connection, transaction
+from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
@@ -12,7 +13,9 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from .schema_docs import register_view_schema, logout_view_schema, user_profile_view_schema
 from .serializers import (
     ForgotPasswordSerializer,
     RegisterSerializer,
@@ -26,7 +29,7 @@ from ..models import Profile
 
 User = get_user_model()
 
-
+@extend_schema(**register_view_schema)
 class RegisterView(JWTTokenMixin, generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
@@ -45,14 +48,11 @@ class RegisterView(JWTTokenMixin, generics.CreateAPIView):
 
         response = super().create(request, *args, **kwargs)
 
-        # حالا self.user مقدار داره چون داخل perform_create ست شده
         tokens = self.set_jwt_cookie(response, self.user)
         response.data = {**tokens, "message": "User registered successfully"}
         return response
 
-
-
-
+@extend_schema(**logout_view_schema)
 class LogoutView(APIView):
     permission_classes = [AllowAny]
 
@@ -139,8 +139,10 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         )
 
 
+@extend_schema(**user_profile_view_schema)
 class UserProfileView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def get(self, request, *args, **kwargs):
         username = kwargs.get('username')
@@ -165,18 +167,21 @@ class UserProfileView(generics.RetrieveAPIView):
         return Response(profile_serializer.data, status=status.HTTP_200_OK)
 
 
-class UpdateProfileView(generics.RetrieveUpdateAPIView):
+class UpdateProfileView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UpdateUserSerializer
     parser_classes = [MultiPartParser, FormParser]
 
-    def get_user(self):
-        return self.request.user.profile
+    def get_object(self):
+        user = self.request.user.profile
+
 
     def patch(self, request, *args, **kwargs):
-        serializer = self.get_serializer(self.get_user(), data=request.data, partial=True,)
+        profile = request.user.profile
+        serializer = self.serializer_class(profile, data=request.data, partial=True,)
         serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 

@@ -133,6 +133,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
+
+    'EXCEPTION_HANDLER': 'Utils.exception_handler.custom_exception_handler',
 }
 
 SPECTACULAR_SETTINGS = {
