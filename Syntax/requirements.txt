@@ -1,0 +1,9 @@
+# for install hash Requirements
+# "pip install -r Requirements/requirements.txt "
+
+
+# for get packages "pipdeptree --freeze --warn silence"
+
+# "pip-compile --generate-hashes Requirements/requirements.in"
+
+
