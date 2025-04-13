@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection, transaction
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
@@ -32,9 +32,9 @@ class RegisterView(JWTTokenMixin, generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
-        user = serializer.save()
-        Profile.objects.create(user=user)
-        return user
+        with transaction.atomic():
+            self.user = serializer.save()
+            Profile.objects.create(user=self.user)
 
     def create(self, request, *args, **kwargs):
         if self.is_authenticated(request):
@@ -42,11 +42,15 @@ class RegisterView(JWTTokenMixin, generics.CreateAPIView):
                 {"detail": "You are already logged in."},
                 status=400
             )
+
         response = super().create(request, *args, **kwargs)
 
+        # حالا self.user مقدار داره چون داخل perform_create ست شده
         tokens = self.set_jwt_cookie(response, self.user)
         response.data = {**tokens, "message": "User registered successfully"}
         return response
+
+
 
 
 class LogoutView(APIView):
@@ -174,4 +178,5 @@ class UpdateProfileView(generics.RetrieveUpdateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
