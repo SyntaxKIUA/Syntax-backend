@@ -71,6 +71,6 @@ user_profile_view_schema = {
                     """
         ),
         403: OpenApiResponse(description="The user is not active."),
-        404: OpenApiResponse(description="The user does not exist."),
+        404: OpenApiResponse(description="The user {username} is not active or does not exist."),
     }
 }

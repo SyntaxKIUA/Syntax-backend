@@ -153,7 +153,7 @@ class UserProfileView(generics.RetrieveAPIView):
         user = User.objects.select_related("profile").get(username=username)
 
         if not user:
-            return Response(f"The user {username} is not active or does not exist.", status=status.HTTP_403_FORBIDDEN)
+            return Response(f"The user {username} is not active or does not exist.", status=status.HTTP_404_NOT_FOUND)
 
         print(user)
         print(connection.queries)
