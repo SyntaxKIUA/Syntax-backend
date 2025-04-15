@@ -6746,7 +6746,7 @@ S2.define('jquery.select2',[
 
   './select2/core',
   './select2/defaults',
-  './select2/utils'
+  './select2/Utils'
 ], function ($, _, Select2, Defaults, Utils) {
   if ($.fn.select2 == null) {
     // All methods that should return the element

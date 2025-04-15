@@ -73,6 +73,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('Accounts.urls'), name='Accounts'),
+    path('search/', include('Search.urls'), name='search'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path(
         'api/swagger/',

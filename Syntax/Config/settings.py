@@ -52,6 +52,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Accounts.apps.AccountsConfig',
+    'Posts.apps.PostsConfig',
+    'Search.apps.SearchConfig',
+
     # Packages
     'rest_framework',
     'rest_framework_simplejwt',
@@ -133,6 +136,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
+
+    'EXCEPTION_HANDLER': 'Utils.exception_handler.custom_exception_handler',
 }
 
 SPECTACULAR_SETTINGS = {

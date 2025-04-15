@@ -142,10 +142,10 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 
 
 class UpdateUserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username')
-    first_name = serializers.CharField(source='user.first_name')
-    last_name = serializers.CharField(source='user.last_name')
-    birth_date = serializers.CharField(source='user.birth_date')
+    username = serializers.CharField(source='user.username', required=False)
+    first_name = serializers.CharField(source='user.first_name', required=False)
+    last_name = serializers.CharField(source='user.last_name', required=False)
+    birth_date = serializers.CharField(source='user.birth_date', required=False)
 
     class Meta :
         model = Profile
