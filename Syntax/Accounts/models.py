@@ -38,6 +38,11 @@ class User(AbstractUser):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'phone_number']
 
+    @property
+    def fullname(self):
+        "Returns the person's full name."
+        return '%s %s' % (self.first_name, self.last_name)
+
     def __str__(self):
         return self.username
 
