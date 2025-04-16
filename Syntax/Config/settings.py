@@ -138,6 +138,18 @@ REST_FRAMEWORK = {
     ],
 
     'EXCEPTION_HANDLER': 'Utils.exception_handler.custom_exception_handler',
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+    'user': '20/minute',  # per 20 requests 3 min
+    },
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+
+
 }
 
 SPECTACULAR_SETTINGS = {
