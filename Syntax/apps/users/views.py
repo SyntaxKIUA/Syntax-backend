@@ -1,7 +1,3 @@
-from http.client import responses
-
-from django.db import connection, transaction
-from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -17,17 +13,14 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from yaml import serialize
 
-from .models import Profile
-from .otp_services import send_sms_kavenegar
+from apps.users.services.otp_services import send_sms_kavenegar
 from .schema.schema_docs import register_view_schema, logout_view_schema, user_profile_view_schema
 from .serializers import (
     ForgotPasswordSerializer,
     RegisterSerializer,
     PasswordResetConfirmSerializer,
-    PrivateProfileSerializer,
-    PublicProfileSerializer, UpdateUserSerializer
+    UpdateUserSerializer
 )
 from .services.user_service import AuthService, LoginService, UpdateService
 from .utils.utils import JWTTokenMixin
