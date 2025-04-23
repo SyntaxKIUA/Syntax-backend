@@ -1,4 +1,5 @@
 from django.db import connection, transaction
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -150,10 +151,8 @@ class UserProfileView(generics.RetrieveAPIView):
         connection.queries.clear()
 
         # fix for is_active
-        user = User.objects.select_related("profile").get(username=username)
 
-        if not user:
-            return Response(f"The user {username} is not active or does not exist.", status=status.HTTP_404_NOT_FOUND)
+        user = get_object_or_404(User.objects.select_related("profile"), username=username)
 
         print(user)
         print(connection.queries)
