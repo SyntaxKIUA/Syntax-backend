@@ -4,7 +4,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import UserRateThrottle
 
-from Accounts.models import User
 from Search.api.filters import CustomSearchFilter
 from Search.api.schema_docs import search_user
 from Search.api.serializers import UserSerializer

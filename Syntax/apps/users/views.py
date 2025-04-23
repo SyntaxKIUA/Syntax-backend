@@ -1,3 +1,5 @@
+from http.client import responses
+
 from django.db import connection, transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
@@ -15,8 +17,11 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from yaml import serialize
 
-from .schema_docs import register_view_schema, logout_view_schema, user_profile_view_schema
+from .models import Profile
+from .otp_services import send_sms_kavenegar
+from .schema.schema_docs import register_view_schema, logout_view_schema, user_profile_view_schema
 from .serializers import (
     ForgotPasswordSerializer,
     RegisterSerializer,
@@ -24,9 +29,8 @@ from .serializers import (
     PrivateProfileSerializer,
     PublicProfileSerializer, UpdateUserSerializer
 )
-from .utils import JWTTokenMixin
-from Accounts.otp_services import send_sms_kavenegar
-from ..models import Profile
+from .services.user_service import AuthService, LoginService, UpdateService
+from .utils.utils import JWTTokenMixin
 
 User = get_user_model()
 
@@ -35,23 +39,20 @@ class RegisterView(JWTTokenMixin, generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
 
-    def perform_create(self, serializer):
-        with transaction.atomic():
-            self.user = serializer.save()
-            Profile.objects.create(user=self.user)
-
     def create(self, request, *args, **kwargs):
         if self.is_authenticated(request):
-            return Response(
-                {"detail": "You are already logged in."},
-                status=400
-            )
+            return Response({"detail": "You are already logged in."},status=400)
 
-        response = super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        tokens = self.set_jwt_cookie(response, self.user)
+        user = AuthService.register_user(serializer.validated_data)
+
+        response = Response(status=status.HTTP_201_CREATED)
+        tokens = self.set_jwt_cookie(response, user)
         response.data = {**tokens, "message": "User registered successfully"}
         return response
+
 
 @extend_schema(**logout_view_schema)
 class LogoutView(APIView):
@@ -148,22 +149,11 @@ class UserProfileView(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         username = kwargs.get('username')
 
-        connection.queries.clear()
+        data, error = LoginService.login_user(request.user, username)
+        if error:
+            return Response({"detail": error}, status=status.HTTP_401_UNAUTHORIZED)
 
-        # fix for is_active
-
-        user = get_object_or_404(User.objects.select_related("profile"), username=username)
-
-        print(user)
-        print(connection.queries)
-        print(len(connection.queries))
-
-        if request.user.id != user.id:
-            profile_serializer = PublicProfileSerializer(user.profile)
-        else:
-            profile_serializer = PrivateProfileSerializer(user.profile)
-
-        return Response(profile_serializer.data, status=status.HTTP_200_OK)
+        return Response(data.data, status=status.HTTP_200_OK)
 
 
 class UpdateProfileView(APIView):
@@ -171,16 +161,8 @@ class UpdateProfileView(APIView):
     serializer_class = UpdateUserSerializer
     parser_classes = [MultiPartParser, FormParser]
 
-    def get_object(self):
-        user = self.request.user.profile
-
-
     def patch(self, request, *args, **kwargs):
-        profile = request.user.profile
-        serializer = self.serializer_class(profile, data=request.data, partial=True,)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
+        data = UpdateService.update_user(request)
+        return Response(data.data, status=status.HTTP_200_OK)
 
 

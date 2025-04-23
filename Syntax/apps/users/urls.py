@@ -1,15 +1,12 @@
 from django.urls import path
-from Accounts.api.views import (
-    ForgotPasswordView,
-    RegisterView,
-    LogoutView,
-    PasswordResetConfirmView,
-    UserProfileView, UpdateProfileView,
-)
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+
+from apps.users.views import RegisterView, LogoutView, ForgotPasswordView, PasswordResetConfirmView, UserProfileView, \
+    UpdateProfileView
 
 urlpatterns = [
     path("api/register/", RegisterView.as_view(), name="register"),
