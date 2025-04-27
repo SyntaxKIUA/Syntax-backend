@@ -13,9 +13,10 @@ from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.users.services.otp_services import send_sms_kavenegar
-from .schema.schema_docs import register_view_schema, logout_view_schema, user_profile_view_schema
+from schema.user.schema_docs import register_view_schema, logout_view_schema, user_profile_view_schema
 from .serializers import (
     ForgotPasswordSerializer,
     RegisterSerializer,
@@ -47,17 +48,42 @@ class RegisterView(JWTTokenMixin, generics.CreateAPIView):
         return response
 
 
+class TokenObtainPairView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+
+        if user.is_authenticated:
+            refresh = RefreshToken.for_user(user)
+
+            response = Response({
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh)
+            })
+
+            # تنظیم کوکی‌ها با نام‌های صحیح
+            response.set_cookie('access', str(refresh.access_token), httponly=True, secure=True, samesite='Lax')
+            response.set_cookie('refresh', str(refresh), httponly=True, secure=True, samesite='Lax')
+
+            return response
+        else:
+            return Response({"error": "User is not authenticated"}, status=401)
+
+
 @extend_schema(**logout_view_schema)
 class LogoutView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         response = Response({"message": "Logout successful"})
 
-        response.delete_cookie("access_token")
-        response.delete_cookie("refresh_token")
+        # پاک کردن کوکی‌های access_token و refresh_token
+        response.delete_cookie('access')
+        response.delete_cookie('refresh')
 
         return response
+
 
 
 class ForgotPasswordView(generics.GenericAPIView):
@@ -146,7 +172,7 @@ class UserProfileView(generics.RetrieveAPIView):
         if error:
             return Response({"detail": error}, status=status.HTTP_401_UNAUTHORIZED)
 
-        return Response(data.data, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class UpdateProfileView(APIView):

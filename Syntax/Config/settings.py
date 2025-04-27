@@ -51,9 +51,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # apps
     'apps.users',
     'Posts.apps.PostsConfig',
-    'Search.apps.SearchConfig',
+    'apps.search',
 
     # Packages
     'rest_framework',
@@ -61,7 +63,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'drf_spectacular_sidecar',
     'corsheaders',
-    'phonenumber_field'
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [
@@ -85,6 +87,7 @@ CSP_STYLE_SRC = ("'self'", 'https://trustedstyles.com')
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
+# CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'Config.urls'
 
@@ -174,6 +177,7 @@ SIMPLE_JWT = {
     'AUTH_COOKIE_HTTP_ONLY': True,
     'AUTH_COOKIE_PATH': '/',
     'AUTH_COOKIE_SAMESITE': 'Lax',
+
 }
 
 # Internationalization

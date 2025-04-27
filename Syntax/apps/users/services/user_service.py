@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework import request
+from rest_framework import request, response
+from rest_framework.response import Response
 from yaml import serialize
 
 from apps.users.models import Profile, User
@@ -26,6 +27,15 @@ class LoginService:
             profile_serializer = PrivateProfileSerializer(user.profile)
 
         return profile_serializer.data, None
+
+class LogoutService:
+    @staticmethod
+    def logout():
+        response = Response({"message": "Logout successful"})
+
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
+
 
 
 class UpdateService:

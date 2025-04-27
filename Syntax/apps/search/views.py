@@ -4,11 +4,11 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import UserRateThrottle
 
-from Search.api.filters import CustomSearchFilter
-from Search.api.schema_docs import search_user
-from Search.api.serializers import UserSerializer
-from Config.throttles import CustomSearchThrottle
-from Search.api.validations import SearchValidator
+from apps.search.filters import CustomSearchFilter
+from apps.search.serializers import UserSerializer
+from apps.search.services.user_search import UserSearchService
+from apps.users.models import User
+from schema.search.schema_docs import search_user
 
 
 class SearchUserPagination(PageNumberPagination):
@@ -27,11 +27,5 @@ class SearchUserView(ListAPIView):
     pagination_class = SearchUserPagination
 
     def get_queryset(self):
-            search_query = self.request.query_params.get('search', None)
-            SearchValidator.validate_search_query(search_query)
-
-            queryset = User.objects.all()
-            if not search_query:
-                return queryset.none()
-
-            return queryset.filter(username__icontains=search_query)
+        search_query = self.request.query_params.get('search', None)
+        return UserSearchService.search_users(search_query)
