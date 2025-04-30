@@ -140,7 +140,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
     ],
 
-    'EXCEPTION_HANDLER': 'Utils.exception_handler.custom_exception_handler',
+    'EXCEPTION_HANDLER': 'apps.Utils.exception_handler.custom_exception_handler',
 
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.UserRateThrottle'

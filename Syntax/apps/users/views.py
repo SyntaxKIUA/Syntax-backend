@@ -16,7 +16,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.users.services.otp_services import send_sms_kavenegar
-from schema.user.schema_docs import register_view_schema, logout_view_schema, user_profile_view_schema
+from apps.schema.user.schema_docs import register_view_schema, logout_view_schema, user_profile_view_schema
 from .serializers import (
     ForgotPasswordSerializer,
     RegisterSerializer,

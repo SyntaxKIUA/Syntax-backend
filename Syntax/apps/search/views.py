@@ -7,8 +7,7 @@ from rest_framework.throttling import UserRateThrottle
 from apps.search.filters import CustomSearchFilter
 from apps.search.serializers import UserSerializer
 from apps.search.services.user_search import UserSearchService
-from apps.users.models import User
-from schema.search.schema_docs import search_user
+from apps.schema import search_user
 
 
 class SearchUserPagination(PageNumberPagination):
