@@ -6,8 +6,8 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from rest_framework import serializers
 
-from .validations import ValidatorForgotPassword
-from ..models import Profile
+from apps.users.models import Profile
+from apps.users.validations.validations import ValidatorForgotPassword
 
 # from rest_framework_simplejwt.tokens import RefreshToken
 

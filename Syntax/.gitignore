@@ -1,7 +1,7 @@
 db.sqlite3
 media/
 assets/
-Accounts/management/
+apps/users/management/
 # pyproject.toml
 **/migrations/**
 migrations/
