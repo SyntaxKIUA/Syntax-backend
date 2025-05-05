@@ -363,7 +363,7 @@ var requirejs, require, define;
             ret = callback ? callback.apply(defined[name], args) : undefined;
 
             if (name) {
-                //If setting exports via "module" is in play,
+                //If settings exports via "module" is in play,
                 //favor that over return value and exports. After that,
                 //favor a non-undefined return value over exports use.
                 if (cjsModule && cjsModule.exports !== undef &&
@@ -5921,7 +5921,7 @@ S2.define('select2/core',[
         arguments.length > 0 && window.console && console.warn) {
       console.warn(
         'Select2: Data can no longer be set using `select2("data")`. You ' +
-        'should consider setting the value instead using `$element.val()`.'
+        'should consider settings the value instead using `$element.val()`.'
       );
     }
 
@@ -6734,7 +6734,7 @@ S2.define('select2/selection/stopPropagation',[
         // by 40 to try and get a more usable deltaFactor.
         // Side note, this actually impacts the reported scroll distance
         // in older browsers and can cause scrolling to be slower than native.
-        // Turn this off by setting $.event.special.mousewheel.settings.adjustOldDeltas to false.
+        // Turn this off by settings $.event.special.mousewheel.settings.adjustOldDeltas to false.
         return special.settings.adjustOldDeltas && orgEvent.type === 'mousewheel' && absDelta % 120 === 0;
     }
 
