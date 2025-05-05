@@ -4,10 +4,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import UserRateThrottle
 
+from apps.schema.search.schema_docs import search_user
 from apps.search.filters import CustomSearchFilter
 from apps.search.serializers import UserSerializer
 from apps.search.services.user_search import UserSearchService
-from apps.schema import search_user
 
 
 class SearchUserPagination(PageNumberPagination):
