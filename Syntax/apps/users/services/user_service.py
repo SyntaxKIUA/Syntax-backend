@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from yaml import serialize
 
 from apps.users.models import Profile, User
-from apps.users.repositories.user_repo import ProfileRepository, UpdateProfileRepository
+from apps.users.repositories.user_repo import ProfileRepository, UpdateProfileRepository, UserNotFoundError
 from apps.users.serializers import PublicProfileSerializer, PrivateProfileSerializer, UpdateUserSerializer
 
 
@@ -17,16 +17,19 @@ class AuthService:
             Profile.objects.create(user=user)
             return user
 
-class LoginService:
+class GetProfileService:
     @staticmethod
-    def login_user(request_user, username):
-        user = ProfileRepository.get_by_username(username)
-        if request_user.id != user.id:
-            profile_serializer = PublicProfileSerializer(user.profile)
-        else:
-            profile_serializer = PrivateProfileSerializer(user.profile)
+    def user_profile(request_user, username):
+        try:
+            user = ProfileRepository.get_by_username(username)
+            if request_user.id != user.id:
+                profile_serializer = PublicProfileSerializer(user.profile)
+            else:
+                profile_serializer = PrivateProfileSerializer(user.profile)
+            return profile_serializer.data, None
+        except UserNotFoundError as e:
+            return {"error": str(e)}, "User not found"
 
-        return profile_serializer.data, None
 
 class LogoutService:
     @staticmethod

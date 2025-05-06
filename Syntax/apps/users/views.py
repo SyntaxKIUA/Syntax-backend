@@ -23,7 +23,7 @@ from .serializers import (
     PasswordResetConfirmSerializer,
     UpdateUserSerializer
 )
-from .services.user_service import AuthService, LoginService, UpdateService
+from .services.user_service import AuthService, GetProfileService, UpdateService
 from .utils.utils import JWTTokenMixin
 
 User = get_user_model()
@@ -168,9 +168,9 @@ class UserProfileView(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         username = kwargs.get('username')
 
-        data, error = LoginService.login_user(request.user, username)
+        data, error = GetProfileService.user_profile(request.user, username)
         if error:
-            return Response({"detail": error}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"detail": error}, status=status.HTTP_404_NOT_FOUND)
 
         return Response(data, status=status.HTTP_200_OK)
 
