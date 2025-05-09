@@ -17,7 +17,7 @@ class Room(models.Model):
     link = models.URLField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.name}, {self.members.count()} members, {self.members.first().username}"
 
 
 class RoomMembership(models.Model):
