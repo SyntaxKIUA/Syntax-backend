@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     # Your apps
     'apps.users',
     'apps.search',
+    'apps.rooms',
 
     # Third-party
     'rest_framework',
@@ -86,6 +87,8 @@ PASSWORD_RESET_TIMEOUT = 60 * 15
 # Phone number
 PHONENUMBER_DEFAULT_REGION = 'IR'
 PHONENUMBER_DB_FORMAT = 'E164'
+
+DEFAULT_ROOM_IMAGE = 'avatars/image_2025-03-11_17-15-47.png'
 
 # Load component configs
 from .components.database import DATABASES
