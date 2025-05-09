@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     # Your apps
     'apps.users',
     'apps.search',
+    'apps.rooms',
 
     # Third-party
     'rest_framework',
