@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from apps.rooms.apps import RoomConfig
+from apps.rooms.models import Room, RoomMembership
+
+admin.site.register(Room)
+admin.site.register(RoomMembership)
