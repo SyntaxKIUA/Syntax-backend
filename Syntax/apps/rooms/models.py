@@ -17,17 +17,12 @@ class Room(models.Model):
     link = models.URLField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.name}, {self.members.count()} members, {self.members.first().username}"
+        return f"{self.name}, {self.members.count()} members"
 
 
 class RoomMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    attachment = models.FileField(upload_to='room_memberships/', blank=True, null=True,
-                                  validators=[
-                                      validate_file_size, FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'png'])
-                                              ]
-                                  )
     joined_at = models.DateTimeField(auto_now_add=True)
     is_admin = models.BooleanField(default=False)
 
@@ -35,3 +30,26 @@ class RoomMembership(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['user', 'room'], name='unique_room_membership'),
         ]
+
+    def __str__(self):
+        return f"{self.user.username}, {self.room.name}"
+
+
+class RoomTaskSubmission(models.Model):
+    membership = models.ForeignKey(RoomMembership, on_delete=models.CASCADE, related_name='submissions')
+    file = models.FileField(
+        upload_to='room_submissions/',
+        validators=[
+            validate_file_size,
+            FileExtensionValidator(allowed_extensions=['pdf', 'docx', 'zip', 'jpg', 'png']),
+        ]
+    )
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    grade = models.FloatField(null=True, blank=True)
+    feedback = models.TextField(blank=True, null=True)
+    is_late = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.membership.user.username} - {self.title}"
