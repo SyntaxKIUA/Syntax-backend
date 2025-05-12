@@ -51,5 +51,11 @@ class RoomTaskSubmission(models.Model):
     feedback = models.TextField(blank=True, null=True)
     is_late = models.BooleanField(default=False)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['submitted_at']),
+            models.Index(fields=['membership']),
+        ]
+
     def __str__(self):
         return f"{self.membership.user.username} - {self.title}"
