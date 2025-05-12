@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListAPIView, CreateAPIView, GenericAPIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from yaml import serialize
@@ -24,6 +25,7 @@ class RoomList(ListAPIView):
 class SubmitRoomTasks(GenericAPIView):
     serializer_class = SubmitTasksSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request,room_id,  *args, **kwargs):
         room = get_object_or_404(Room, id=room_id)
