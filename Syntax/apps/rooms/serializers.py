@@ -19,3 +19,15 @@ class SubmitTasksSerializer(serializers.ModelSerializer):
             'title',
             'description',
         ]
+
+class GetTasksSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RoomTaskSubmission
+        fields = [
+            'membership',
+            'file',
+            'title',
+            'description',
+            'submitted_at'
+        ]
+

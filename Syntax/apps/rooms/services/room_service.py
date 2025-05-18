@@ -1,7 +1,7 @@
 from django.template.defaultfilters import title
 
-from apps.rooms.models import Room
-from apps.rooms.repositories.room_repo import RoomListRepository
+from apps.rooms.models import Room, RoomTaskSubmission
+from apps.rooms.repositories.room_repo import RoomListRepository, RoomTaskSubmissionRepository
 
 
 class RoomListService:
@@ -21,4 +21,9 @@ class RoomListService:
             )
         except Exception as e:
             return e
+
+class RoomTaskService:
+    @staticmethod
+    def get_room_tasks(room):
+        return RoomTaskSubmissionRepository.get_tasks(room)
 

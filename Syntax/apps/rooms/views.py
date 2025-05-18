@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from yaml import serialize
 
 from apps.rooms.models import Room
-from apps.rooms.serializers import RoomListSerializer, SubmitTasksSerializer
-from apps.rooms.services.room_service import RoomListService
+from apps.rooms.serializers import RoomListSerializer, SubmitTasksSerializer, GetTasksSerializer
+from apps.rooms.services.room_service import RoomListService, RoomTaskService
 
 
 class RoomList(ListAPIView):
@@ -53,4 +53,17 @@ class SubmitRoomTasks(GenericAPIView):
 
 
 
+class GetRoomTasks(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        room_id = kwargs.get('room')
+        room = get_object_or_404(Room, id=room_id)
+
+        task = RoomTaskService.get_room_tasks(room)
+        if not task.exists():
+            return Response({"detail": "You have not any task to get them."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = GetTasksSerializer(task, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
