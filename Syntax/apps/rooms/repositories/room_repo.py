@@ -22,3 +22,8 @@ class RoomListRepository:
             title=title,
             description=description,
         )
+
+class RoomTaskSubmissionRepository:
+    @staticmethod
+    def get_tasks(room):
+        return RoomTaskSubmission.objects.select_related('membership__user').filter(membership__room=room)
