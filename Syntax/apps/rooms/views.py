@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from yaml import serialize
 
+from apps.Utils.room.permissions import IsRoomAdmin
 from apps.rooms.models import Room
 from apps.rooms.serializers import RoomListSerializer, SubmitTasksSerializer, GetTasksSerializer
 from apps.rooms.services.room_service import RoomListService, RoomTaskService
@@ -54,7 +55,7 @@ class SubmitRoomTasks(GenericAPIView):
 
 
 class GetRoomTasks(ListAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsRoomAdmin]
 
     def get(self, request, *args, **kwargs):
         room_id = kwargs.get('room')
