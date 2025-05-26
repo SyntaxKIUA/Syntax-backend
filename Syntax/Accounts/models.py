@@ -10,7 +10,7 @@ class User(AbstractUser):
     username_validator = UnicodeUsernameValidator()
 
     username = models.CharField(
-        _("username"),
+        
         max_length=150,
         unique=True,
         help_text=_(
