@@ -24,6 +24,7 @@ class RoomMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(auto_now_add=True)
+    test = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
     class Meta:
