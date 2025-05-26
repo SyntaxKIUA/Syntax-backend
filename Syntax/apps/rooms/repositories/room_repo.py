@@ -23,6 +23,7 @@ class RoomListRepository:
             description=description,
         )
 
+
 class RoomTaskSubmissionRepository:
     @staticmethod
     def get_tasks(room):
