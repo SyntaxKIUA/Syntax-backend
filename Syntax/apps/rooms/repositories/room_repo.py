@@ -29,3 +29,5 @@ class RoomTaskSubmissionRepository:
     def get_tasks(room):
         return (RoomTaskSubmission.objects.only('membership','file', 'title', 'description', 'submitted_at')
                 .select_related('membership','membership__user').filter(membership__room=room))
+
+
