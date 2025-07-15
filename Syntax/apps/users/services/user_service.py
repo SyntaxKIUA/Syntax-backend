@@ -1,13 +1,12 @@
+from django.core.cache import cache
 from django.db import transaction
-from django.shortcuts import get_object_or_404
-from rest_framework import request, response
 from rest_framework.response import Response
-from yaml import serialize
-
 from apps.users.models import Profile, User
 from apps.users.repositories.user_repo import ProfileRepository, UpdateProfileRepository, UserNotFoundError
 from apps.users.serializers import PublicProfileSerializer, PrivateProfileSerializer, UpdateUserSerializer
+import logging
 
+logger = logging.getLogger(__name__)
 
 class AuthService:
     @staticmethod
@@ -20,13 +19,24 @@ class AuthService:
 class GetProfileService:
     @staticmethod
     def user_profile(request_user, username):
+        cache_key = f"user_profile:{request_user.id}:{username}"
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return cached_data, None
+
         try:
             user = ProfileRepository.get_by_username(username)
+
             if request_user.id != user.id:
                 profile_serializer = PublicProfileSerializer(user.profile)
             else:
                 profile_serializer = PrivateProfileSerializer(user.profile)
-            return profile_serializer.data, None
+
+            data = profile_serializer.data
+            cache.set(cache_key, data, timeout=600)
+
+            return data, None
+
         except UserNotFoundError as e:
             return {"error": str(e)}, "User not found"
 
@@ -50,6 +60,9 @@ class UpdateService:
         serializer = UpdateUserSerializer(profile, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        cache_key = f"user_profile:{request.user.id}:{request.user.username}"
+        cache.delete(cache_key)
 
         return serializer
 
